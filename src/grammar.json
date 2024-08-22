@@ -12827,6 +12827,10 @@
     {
       "type": "SYMBOL",
       "name": "pragma"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "dantempl"
     }
   ],
   "conflicts": [
@@ -13092,6 +13096,10 @@
     {
       "type": "SYMBOL",
       "name": "pragma"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "dantempl"
     },
     {
       "type": "SYMBOL",

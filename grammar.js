@@ -62,6 +62,7 @@ module.exports = grammar({
     $.comment,
     $.haddock,
     $.pragma,
+    $.dantempl,
   ],
 
   /**

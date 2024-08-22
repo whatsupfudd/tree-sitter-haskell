@@ -6141,6 +6141,10 @@
     "named": false
   },
   {
+    "type": "dantempl",
+    "named": true
+  },
+  {
     "type": "data",
     "named": false
   },

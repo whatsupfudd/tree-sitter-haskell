@@ -137,6 +137,7 @@ typedef enum {
   HADDOCK,
   CPP,
   PRAGMA,
+  DANTEMPL,
   QQ_START,
   QQ_BODY,
   SPLICE,
@@ -335,6 +336,7 @@ typedef enum {
   LQuoteClose,
   LPragma,
   LBlockComment,
+  LDanTempl,
   LLineComment,
   LBraceClose,
   LBraceOpen,
@@ -376,6 +378,7 @@ static const char *token_names[] = {
   "texp-closer",
   "quote-close",
   "pragma",
+  "dantempl",
   "block-comment",
   "line-comment",
   "brace-close",
@@ -2366,7 +2369,10 @@ static Lexed lex_cpp(Env *env) {
 static Lexed lex_extras(Env *env, bool bol) {
   switch (peek0(env)) {
     case '{':
-      if (char1(env, '-')) return char2(env, '#') ? LPragma : LBlockComment;
+      if (char1(env, '-'))
+        return char2(env, '#') ? LPragma : LBlockComment;
+      else
+        if (char1(env, '{')) return LDanTempl;
       break;
     case '#':
       if (bol) return lex_cpp(env);
@@ -2541,6 +2547,29 @@ static Symbol block_comment(Env *env) {
 }
 
 // --------------------------------------------------------------------------------------------------------
+// Daniell Template
+// --------------------------------------------------------------------------------------------------------
+
+static uint32_t consume_dantempl(Env *env) {
+  if (seq(env, "{{")) {
+    while (!seq(env, "}}") && not_eof(env)) {
+      reset_lookahead(env);
+      advance_over(env, 0);
+    }
+    return true;
+  }
+  return false;
+}
+
+static Symbol dantempl(Env *env) {
+  if (consume_dantempl(env)) {
+    MARK("dantempl");
+    return finish(DANTEMPL, "newline");
+  }
+  return FAIL;
+}
+
+// --------------------------------------------------------------------------------------------------------
 // Pragma
 // --------------------------------------------------------------------------------------------------------
 
@@ -2665,6 +2694,7 @@ static Symbol resolve_semicolon(Env *env, Lexed next) {
       case LBlockComment:
       case LPragma:
       case LSemi:
+      case LDanTempl:
         break;
       default:
         env->state->newline.skip_semi = false;
@@ -2724,6 +2754,8 @@ static Symbol process_token_safe(Env *env, Lexed next) {
       break;
     case LPragma:
       return pragma(env);
+    case LDanTempl:
+      return dantempl(env);
     case LBlockComment:
       return block_comment(env);
     case LLineComment:

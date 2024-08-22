@@ -101,6 +101,7 @@ module.exports = {
     $.haddock,
     $.cpp,
     $.pragma,
+    $.dantempl,
 
     // Starting quote brackets are a bit messy, so it's easier to let the scanner signal that it encountered one.
     // The body produces a text node until the ending bracket.
